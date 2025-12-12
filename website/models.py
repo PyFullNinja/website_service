@@ -25,7 +25,7 @@ class Services(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     service_name = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.String(500), nullable=False)
+    description = db.Column(db.String(1000), nullable=False)
     price = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, ForeignKey("users.id", name="fk_services_user_id"), nullable=False)
     contact = db.Column(db.String(150), nullable=False)

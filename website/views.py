@@ -194,7 +194,7 @@ def add_admin():
             user.is_admin = True
             db.session.commit()
     
-    return render_template('admin_panel.html', title='Додати адміна', show_form_add_admin=True, form=form)
+    return render_template('admin_panel.html', title='Додати адміна', show="додати адміна", form=form)
 
 
 @app.route('/manage_services')
@@ -202,4 +202,22 @@ def add_admin():
 def manage_services():
     if not current_user.is_admin:
         return redirect(url_for("index"))
-    return render_template('manage_services.html', title='Керування послугами', services=Services.query.all())
+    return render_template('admin_panel.html', title='Керування послугами', services=Services.query.all(), show="керування послугами")
+
+
+@app.route('/admin_delete_service/<int:service_id>')
+@login_required
+def admin_delete_service(service_id):
+    if not current_user.is_admin:
+        return redirect(url_for("index"))
+    
+    service_delete = Services.query.get_or_404(service_id)
+    
+    # Delete associated photos first
+    Photos.query.filter_by(service_id=service.id).delete()
+    
+    # Delete the service
+    db.session.delete(service_delete)
+    db.session.commit()
+    
+    return redirect(url_for('manage_services'))

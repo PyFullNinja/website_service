@@ -27,7 +27,7 @@ class services(db.Model, UserMixin):
     service_name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     price = db.Column(db.Float, nullable=False)
-    user_id = mapped_column(ForeignKey("users.id"))
+    user_id = db.Column(db.Integer, ForeignKey("users.id", name="fk_services_user_id"), nullable=False)
     contact = db.Column(db.String(150), nullable=False)
     photos = db.relationship("photos", backref="service", lazy=True)
     views = db.Column(db.Integer, default=0)

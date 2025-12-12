@@ -3,4 +3,4 @@ __pycache__
 *.pyc
 instance/
 .venv/
-static/photo/*
+static/photo/

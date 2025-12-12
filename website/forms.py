@@ -28,3 +28,7 @@ class ServiceForm(FlaskForm):
     description = StringField("Опис", [validators.DataRequired()])
     price = StringField("Ціна", [validators.DataRequired()])
     contact = StringField("Ваші контакти", [validators.DataRequired()])
+
+
+class AdminForm(FlaskForm):
+    username = StringField("Ім'я користувача", [validators.DataRequired()])

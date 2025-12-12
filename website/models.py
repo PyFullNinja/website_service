@@ -20,7 +20,7 @@ class Users(db.Model, UserMixin):
         return f"<User {self.username}>"
 
 
-class services(db.Model, UserMixin):
+class Services(db.Model, UserMixin):
     __tablename__ = "services"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -29,14 +29,14 @@ class services(db.Model, UserMixin):
     price = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, ForeignKey("users.id", name="fk_services_user_id"), nullable=False)
     contact = db.Column(db.String(150), nullable=False)
-    photos = db.relationship("photos", backref="service", lazy=True)
+    photos = db.relationship("Photos", backref="service", lazy=True)
     views = db.Column(db.Integer, default=0)
 
     def __repr__(self):
         return f"<Service {self.service_name}>"
 
 
-class photos(db.Model, UserMixin):
+class Photos(db.Model, UserMixin):
     __tablename__ = "photos"
 
     id = db.Column(db.Integer, primary_key=True)

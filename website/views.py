@@ -19,7 +19,7 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
-    all_services = services.query.all()
+    all_services = Services.query.all()
     return render_template("index.html", title="Головна сторінка", services=all_services)
 
 
@@ -69,7 +69,7 @@ def logout():
 
 @app.route("/profile")
 def profile():
-    user_services = services.query.filter_by(user_id=current_user.id).all()
+    user_services = Services.query.filter_by(user_id=current_user.id).all()
     return render_template("profile.html", title="Мій профіль", services=user_services)
 
 
@@ -78,7 +78,7 @@ def profile():
 def add_service():
     form = ServiceForm()
     if form.validate_on_submit():
-        service = services(
+        service = Services(
             service_name=form.service_name.data,
             description=form.description.data,
             price=float(form.price.data),
@@ -95,7 +95,7 @@ def add_service():
                 unique_filename = str(uuid.uuid4()) + "_" + filename
                 photo.save(os.path.join("website/static/photo", unique_filename))
 
-                photo_record = photos(
+                photo_record = Photos(
                     service_id=service.id,
                     photo_url="/static/photo/" + unique_filename,
                 )
@@ -111,7 +111,7 @@ def add_service():
 @app.route("/service/<int:service_id>")
 @cache.cached(timeout=60)
 def service(service_id):
-    service = services.query.get_or_404(service_id)
+    service = Services.query.get_or_404(service_id)
     service.views += 1
     db.session.commit()
     return render_template("service.html", title="Послуга", service=service)
@@ -120,7 +120,7 @@ def service(service_id):
 @app.route("/edit_service/<int:service_id>", methods=["GET", "POST"])
 @login_required
 def edit_service(service_id):
-    service = services.query.get_or_404(service_id)
+    service = Services.query.get_or_404(service_id)
 
     if service.user_id != current_user.id:
         return redirect(url_for("index"))
@@ -142,7 +142,7 @@ def edit_service(service_id):
                 unique_filename = str(uuid.uuid4()) + "_" + filename
                 photo.save(os.path.join("website/static/photo", unique_filename))
 
-                photo_record = photos(
+                photo_record = Photos(
                     service_id=service.id,
                     photo_url="/static/photo/" + unique_filename,
                 )
@@ -162,12 +162,12 @@ def edit_service(service_id):
 @app.route("/delete_service/<int:service_id>")
 @login_required
 def delete_service(service_id):
-    service = services.query.get_or_404(service_id)
+    service = Services.query.get_or_404(service_id)
 
     if service.user_id != current_user.id:
         return redirect(url_for("index"))
 
-    photos.query.filter_by(service_id=service.id).delete()
+    Photos.query.filter_by(service_id=service.id).delete()
     db.session.delete(service)
     db.session.commit()
     return redirect(url_for("profile"))
@@ -186,14 +186,15 @@ def add_admin():
     if not current_user.is_admin:
         return redirect(url_for("index"))
     
-    if request.method == 'POST':
-        username = request.form.get('username')
+    form = AdminForm()
+    if form.validate_on_submit():
+        username = form.username.data
         user = Users.query.filter_by(username=username).first()
         if user:
             user.is_admin = True
             db.session.commit()
     
-    return render_template('admin_panel.html', title='Додати адміна', show_form_add_admin=True)
+    return render_template('admin_panel.html', title='Додати адміна', show_form_add_admin=True, form=form)
 
 
 @app.route('/manage_services')
@@ -201,4 +202,4 @@ def add_admin():
 def manage_services():
     if not current_user.is_admin:
         return redirect(url_for("index"))
-    return render_template('manage_services.html', title='Керування послугами', services=services.query.all())
+    return render_template('manage_services.html', title='Керування послугами', services=Services.query.all())

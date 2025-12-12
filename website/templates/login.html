@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+
+{% block main %}
+
+
+
+<!-- <div class="container", style="max-width: 500px; margin-top: 50px;"> -->
+<!--   <center><h1 class="mt-5", style="">Вхід</h1></center> -->
+<!--     <form> -->
+<!--       <div class="mb-3"> -->
+<!--         <label for="exampleInputEmail1" class="form-label">Email address</label> -->
+<!--         <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"> -->
+<!--         <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
+<!--       </div> -->
+<!--       <div class="mb-3"> -->
+<!--         <label for="exampleInputPassword1" class="form-label">Password</label> -->
+<!--         <input type="password" class="form-control" id="exampleInputPassword1"> -->
+<!--       </div> -->
+<!--       <button type="submit" class="btn btn-primary">Submit</button> -->
+<!--     </form> -->
+<!-- </div> -->
+
+
+<div class="container", style="max-width: 500px; margin-top: 50px;">
+<form action="{{ url_for('login') }}" method="post">
+    {{form.hidden_tag()}}
+    <div class="d-flex justify-content-center">
+        <div class="col-md-8">
+            <center><h1 class="mt-5">Вхід</h1></center>
+            {% for field in form if field.type != 'CSRFTokenField' %}
+              <div class="mb-3">
+                {{ field.label() }}
+                {{ field(class = 'form-control') }}
+              </div>
+              {% endfor %}
+            <button type="submit" class="btn btn-success btn-lg">
+                Submit
+            </button>
+        </div>
+    </div>
+</form>
+</div>
+{% endblock main %}

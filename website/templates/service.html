@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+
+{% block main %}
+<div style="max-width: 800px; margin-top: 50px;">
+  <div class="card">
+    <img src="{{ service.photos[0].photo_url }}" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">{{ service.service_name }}</h5>
+      <p class="card-text">{{ service.description }}</p>
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">Ціна: {{ service.price }} грн</li>
+      <li class="list-group-item">Контакти: {{ service.contact }}</li>
+    </ul>
+    <div class="card-body">
+      <p class="card-text">Переглядів: {{ service.views }}</p>
+    </div>
+  </div>
+</div>
+{% endblock main %}

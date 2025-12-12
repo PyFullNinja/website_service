@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}
+{% endblock title %}
+
+{% block main %}
+<form action="{{ url_for('edit_service', service_id=service.id) }}" method="post" enctype="multipart/form-data">
+    {{form.hidden_tag()}}
+    <div class="d-flex justify-content-center">
+        <div class="col-md-5">
+          <center><h2 style="margin-top:20px;">Редагування послуги</h2></center> 
+            {% for field in form if field.type != 'CSRFTokenField' %}
+                <div class="card-body", style="margin-top:10px;">
+                    {{ field.label() }}
+                    {{ field(class = 'form-control') }}
+                </div>
+            {% endfor %}
+
+            <div class="card-body" style="margin-top:10px;">
+                <label for="photo" class="form-label">Нове фото (необов'язково)</label>
+                <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+            </div>
+            
+            <button type="submit" class="btn btn-success btn-lg", style="margin-top:20px;">
+                Змінити
+            </button>
+
+            <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-lg" style="margin-top:20px;">
+                Скасувати
+            </a>
+            
+            
+        </div>
+    </div>
+</form>
+{% endblock main %}

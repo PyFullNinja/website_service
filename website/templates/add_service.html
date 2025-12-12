@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+
+{% block main %}
+<div class="container", style="max-width: 800px; margin-top: 50px;">
+<form action="{{ url_for('add_service') }}" method="post" enctype="multipart/form-data">
+    {{form.hidden_tag()}}
+    <div class="d-flex justify-content-center">
+        <div class="col-md-8">
+            <center><h1 class="mt-5">Додати свою послугу</h1></center>
+            {% for field in form if field.type != 'CSRFTokenField' %}
+              <div class="mb-3">
+                {{ field.label() }}
+                {{ field(class = 'form-control') }}
+              </div>
+              {% endfor %}
+            <div class="mb-3">
+                <label for="photo" class="form-label">Фото послуги</label>
+                <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+            </div>
+            <button type="Sumbit" class="btn btn-success btn-lg">
+                Виставити
+            </button>
+        </div>
+    </div>
+</form>
+</div>
+{% endblock main %}

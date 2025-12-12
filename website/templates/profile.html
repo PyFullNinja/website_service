@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+
+{% block main %}
+<div style="margin-top: 50px;">
+  <center><h1>Мій профіль</h1></center>
+</div>
+<div class="container", style="max-width: 600px; margin-top: 50px;">
+    <ul class="list-group">
+        <li class="list-group-item"><strong>Нікнейм:</strong> {{ current_user.username }}</li> 
+        <li class="list-group-item"><strong>Ім'я:</strong> {{ current_user.first_name }}</li>
+        <li class="list-group-item"><strong>Прізвище:</strong> {{ current_user.last_name }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ current_user.email }}</li>
+        <li class="list-group-item"><strong>Пароль:</strong> 
+          <button class="btn"> змінити пароль </button>
+        </li>
+    </ul>
+</div>
+
+<div style="margin-top: 50px;">
+  <center><h1>Мої послуги</h1></center>
+</div>
+<div class="container", style="max-width: 800px; margin-top: 50px;">
+    {% for service in services %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ service.service_name }}</h5>
+        <p class="card-text">{{ service.description }}</p>
+        <p class="card-text"><strong>Ціна:</strong> {{ service.price }} грн</p>
+        <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-primary">Редагувати</a>
+        <a href="{{ url_for('delete_service', service_id=service.id)}}" class="btn btn-danger">Видалити</a>
+      </div>
+    </div>
+    {% else %}
+    <p>У вас ще немає доданих послуг.</p>
+    {% endfor %}
+</div>
+
+
+{% endblock main %}

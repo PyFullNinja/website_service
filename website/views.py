@@ -213,11 +213,37 @@ def admin_delete_service(service_id):
     
     service_delete = Services.query.get_or_404(service_id)
     
-    # Delete associated photos first
     Photos.query.filter_by(service_id=service.id).delete()
     
-    # Delete the service
     db.session.delete(service_delete)
     db.session.commit()
     
     return redirect(url_for('manage_services'))
+
+
+
+@app.route('/delete_user/<int:user_id>')
+@login_required
+def delete_user(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for("index"))
+    
+    user_to_delete = Users.query.get_or_404(user_id)
+    
+    services = Services.query.filter_by(user_id=user_id).all()
+    for service in services:
+        Photos.query.filter_by(service_id=service.id).delete()
+        db.session.delete(service)
+    
+    db.session.delete(user_to_delete)
+    db.session.commit()
+    
+    return redirect(url_for('users'))
+
+
+@app.route('/users')
+@login_required
+def users():
+    if not current_user.is_admin:
+        return redirect(url_for("index"))
+    return render_template('admin_panel.html', title='Користувачі', users=Users.query.all(), show="користувачі", user_count=len(Users.query.all()))

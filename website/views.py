@@ -19,7 +19,11 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
-    all_services = Services.query.all()
+    q = request.args.get("q")
+    if q:
+        all_services = Services.query.filter(Services.service_name.contains(q) | Services.description.contains(q)).all()
+    else:
+        all_services = Services.query.all()
     return render_template("index.html", title="Головна сторінка", services=all_services)
 
 
@@ -90,17 +94,16 @@ def add_service():
 
         if "photo" in request.files:
             photo = request.files["photo"]
-            if photo.filename != "":
-                filename = secure_filename(photo.filename)
-                unique_filename = str(uuid.uuid4()) + "_" + filename
-                photo.save(os.path.join("website/static/photo", unique_filename))
+            filename = secure_filename(photo.filename)
+            unique_filename = str(uuid.uuid4()) + "_" + filename
+            photo.save(os.path.join("website/static/photo", unique_filename))
 
-                photo_record = Photos(
-                    service_id=service.id,
-                    photo_url="/static/photo/" + unique_filename,
-                )
-                db.session.add(photo_record)
-                db.session.commit()
+            photo_record = Photos(
+                service_id=service.id,
+                photo_url="/static/photo/" + unique_filename,
+            )
+            db.session.add(photo_record)
+            db.session.commit()
 
         return redirect(url_for("index"))
 
@@ -137,17 +140,16 @@ def edit_service(service_id):
 
         if "photo" in request.files:
             photo = request.files["photo"]
-            if photo.filename != "":
-                filename = secure_filename(photo.filename)
-                unique_filename = str(uuid.uuid4()) + "_" + filename
-                photo.save(os.path.join("website/static/photo", unique_filename))
+            filename = secure_filename(photo.filename)
+            unique_filename = str(uuid.uuid4()) + "_" + filename
+            photo.save(os.path.join("website/static/photo", unique_filename))
 
-                photo_record = Photos(
-                    service_id=service.id,
-                    photo_url="/static/photo/" + unique_filename,
-                )
-                db.session.add(photo_record)
-                db.session.commit()
+            photo_record = Photos(
+                service_id=service.id,
+                photo_url="/static/photo/" + unique_filename,
+            )
+            db.session.add(photo_record)
+            db.session.commit()
 
         return redirect(url_for("service", service_id=service.id))
 
@@ -247,3 +249,19 @@ def users():
     if not current_user.is_admin:
         return redirect(url_for("index"))
     return render_template('admin_panel.html', title='Користувачі', users=Users.query.all(), show="користувачі", user_count=len(Users.query.all()))
+
+
+@app.route('/change_password/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def change_password(user_id):
+    form = ChangePassword()
+    if form.validate_on_submit():
+        user = Users.query.get_or_404(user_id)
+        if user.password != generate_password_hash(request.form['password_old']):
+            return redirect(url_for('users'))
+        else:
+            user.password = generate_password_hash(request.form['password_new'])
+        db.session.commit()
+        return redirect(url_for('profile'))
+    
+    return render_template('change_password.html', title='Зміна паролю', user_id=user_id, form=form)

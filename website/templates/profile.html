@@ -3,41 +3,101 @@
 {{ title }}
 {% endblock title %}
 
-
 {% block main %}
-<div style="margin-top: 50px;">
-  <center><h1>Мій профіль</h1></center>
-</div>
-<div class="container", style="max-width: 600px; margin-top: 50px;">
-    <ul class="list-group">
-        <li class="list-group-item"><strong>Нікнейм:</strong> {{ current_user.username }}</li> 
-        <li class="list-group-item"><strong>Ім'я:</strong> {{ current_user.first_name }}</li>
-        <li class="list-group-item"><strong>Прізвище:</strong> {{ current_user.last_name }}</li>
-        <li class="list-group-item"><strong>Email:</strong> {{ current_user.email }}</li>
-        <li class="list-group-item"><strong>Пароль:</strong> 
-          <button class="btn"> змінити пароль </button>
-        </li>
-    </ul>
-</div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 24px;">
+                    {{ current_user.first_name[0] }}
+                </div>
+                <div class="ms-3">
+                    <h2 class="mb-0 fw-bold">Особистий кабінет</h2>
+                    <p class="text-muted mb-0">Вітаємо, {{ current_user.first_name }}!</p>
+                </div>
+            </div>
 
-<div style="margin-top: 50px;">
-  <center><h1>Мої послуги</h1></center>
-</div>
-<div class="container", style="max-width: 800px; margin-top: 50px;">
-    {% for service in services %}
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title">{{ service.service_name }}</h5>
-        <p class="card-text">{{ service.description }}</p>
-        <p class="card-text"><strong>Ціна:</strong> {{ service.price }} грн</p>
-        <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-primary">Редагувати</a>
-        <a href="{{ url_for('delete_service', service_id=service.id)}}" class="btn btn-danger" onclick="return confirm('Ви впевнені, що хочете видалити цю послугу?')">Видалити</a>
-      </div>
+            <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active px-4" id="pills-info-tab" data-bs-toggle="pill" data-bs-target="#pills-info" type="button" role="tab">Мої дані</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4" id="pills-services-tab" data-bs-toggle="pill" data-bs-target="#pills-services" type="button" role="tab">Мої послуги</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-info" role="tabpanel">
+                    <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="text-muted small">Нікнейм</label>
+                                <p class="fs-5 fw-medium border-bottom pb-2">{{ current_user.username }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small">Email</label>
+                                <p class="fs-5 fw-medium border-bottom pb-2">{{ current_user.email }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small">Ім'я</label>
+                                <p class="fs-5 fw-medium border-bottom pb-2">{{ current_user.first_name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small">Прізвище</label>
+                                <p class="fs-5 fw-medium border-bottom pb-2">{{ current_user.last_name }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="{{ url_for('change_password', user_id=current_user.id) }}" class="btn btn-outline-warning btn-sm rounded-pill px-4 fw-medium shadow-sm">
+                                <i class="bi bi-shield-lock me-1"></i> Змінити пароль
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="pills-services" role="tabpanel">
+                    {% for service in services %}
+                    <div class="card border-0 shadow-sm mb-3 overflow-hidden" style="border-radius: 12px;">
+                        <div class="row g-0">
+                            <div class="col-md-2 bg-light d-flex align-items-center justify-content-center" style="min-height: 120px;">
+                                {% if service.photos %}
+                                <img src="{{ service.photos[0].photo_url }}" class="img-fluid object-fit-cover h-100" alt="...">
+                                {% else %}
+                                <i class="bi bi-image text-secondary fs-1"></i>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-10">
+                                <div class="card-body d-flex flex-column h-100">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h5 class="card-title fw-bold">{{ service.service_name }}</h5>
+                                        <span class="badge bg-soft-primary text-primary border border-primary px-3">{{ service.price }} грн</span>
+                                    </div>
+                                    <p class="card-text text-muted small flex-grow-1 mt-2 text-truncate" style="max-width: 500px;">{{ service.description }}</p>
+                                    <div class="mt-3 d-flex gap-2">
+                                        <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-primary btn-sm px-3">Редагувати</a>
+                                        <a href="{{ url_for('delete_service', service_id=service.id)}}" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Ви впевнені?')">Видалити</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <p class="text-muted">У вас ще немає доданих послуг.</p>
+                        <a href="{{ url_for('add_service') }}" class="btn btn-primary mt-2">Додати першу послугу</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
-    {% else %}
-    <p>У вас ще немає доданих послуг.</p>
-    {% endfor %}
 </div>
 
-
+<style>
+    .bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); }
+    .nav-pills .nav-link.active { border-radius: 50px; }
+    .nav-pills .nav-link { color: #6c757d; font-weight: 500; }
+    .card { transition: transform 0.2s ease; }
+    .card:hover { transform: translateY(-2px); }
+</style>
 {% endblock main %}

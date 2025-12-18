@@ -1,35 +1,90 @@
 {% extends 'base.html' %}
-{% block title %}
-{% endblock title %}
+{% block title %}Редагування: {{ service.service_name }}{% endblock title %}
 
 {% block main %}
-<form action="{{ url_for('edit_service', service_id=service.id) }}" method="post" enctype="multipart/form-data">
-    {{form.hidden_tag()}}
-    <div class="d-flex justify-content-center">
-        <div class="col-md-5">
-          <center><h2 style="margin-top:20px;">Редагування послуги</h2></center> 
-            {% for field in form if field.type != 'CSRFTokenField' %}
-                <div class="card-body", style="margin-top:10px;">
-                    {{ field.label() }}
-                    {{ field(class = 'form-control') }}
-                </div>
-            {% endfor %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-uppercase" style="letter-spacing: 1px;">Редагування послуги</h2>
+                <p class="text-muted">Оновіть інформацію про вашу послугу, щоб залучити більше клієнтів</p>
+            </div>
 
-            <div class="card-body" style="margin-top:10px;">
-                <label for="photo" class="form-label">Нове фото (необов'язково)</label>
-                <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+            <div class="card border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="card-body p-4 p-md-5">
+                    <form action="{{ url_for('edit_service', service_id=service.id) }}" method="post" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+
+                        <div class="row g-4">
+                            {% for field in form if field.type != 'CSRFTokenField' %}
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold mb-2" style="font-size: 0.9rem;">
+                                        {{ field.label.text }}
+                                    </label>
+                                    
+                                    {% if field.id == 'description' or field.type == 'TextAreaField' %}
+                                        {# Увеличиваем поле описания (5 строк в высоту) #}
+                                        {{ field(class = 'form-control bg-light border-0', 
+                                                style='border-radius: 10px; font-size: 1rem;',
+                                                rows="5", 
+                                                placeholder="Опишіть вашу послугу детально...") }}
+                                    {% else %}
+                                        {{ field(class = 'form-control form-control-lg bg-light border-0', 
+                                                style='border-radius: 10px; font-size: 1rem;',
+                                                placeholder="Введіть " + field.label.text|lower) }}
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="text-danger small mt-1">{{ error }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            <div class="col-12">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <label for="photo" class="form-label fw-semibold">Нове фото</label>
+                                    <p class="text-muted small mb-3">Залиште порожнім, якщо не хочете змінювати поточне зображення</p>
+                                    <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4 d-grid d-md-flex gap-3 justify-content-md-end">
+                                <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary btn-lg px-5 rounded-pill order-2 order-md-1">
+                                    Скасувати
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm order-1 order-md-2">
+                                    Зберегти зміни
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
             
-            <button type="submit" class="btn btn-success btn-lg", style="margin-top:20px;">
-                Змінити
-            </button>
-
-            <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-lg" style="margin-top:20px;">
-                Скасувати
-            </a>
-            
-            
+            <div class="text-center mt-4">
+                <small class="text-muted">Послугу буде оновлено миттєво після збереження</small>
+            </div>
         </div>
     </div>
-</form>
+</div>
+
+<style>
+    /* Эффект фокуса для полей ввода */
+    .form-control:focus {
+        background-color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        border: 1px solid #0d6efd !important;
+    }
+    
+    /* Анимация кнопки */
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3) !important;
+    }
+</style>
 {% endblock main %}

@@ -1,47 +1,45 @@
 {% extends 'base.html' %}
+
 {% block title %}
 {{ title }}
 {% endblock title %}
 
-
 {% block main %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+    
+    <div class="card shadow-lg border-0 rounded-4" style="max-width: 450px; width: 100%;">
+        <div class="card-body p-5">
+            
+            <h2 class="text-center mb-4 fw-bold text-secondary">Вхід</h2>
+            
+            <form action="{{ url_for('login') }}" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                
+                {% for field in form if field.type != 'CSRFTokenField' %}
+                    <div class="mb-4">
+                        {{ field.label(class="form-label fw-semibold text-muted small") }}
+                        
+                        {% if field.errors %}
+                            {{ field(class="form-control form-control-lg is-invalid bg-light") }}
+                            <div class="invalid-feedback">
+                                {% for error in field.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ field(class="form-control form-control-lg bg-light border-0") }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
 
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm fw-bold">
+                        Увійти
+                    </button>
+                </div>
 
-
-<!-- <div class="container", style="max-width: 500px; margin-top: 50px;"> -->
-<!--   <center><h1 class="mt-5", style="">Вхід</h1></center> -->
-<!--     <form> -->
-<!--       <div class="mb-3"> -->
-<!--         <label for="exampleInputEmail1" class="form-label">Email address</label> -->
-<!--         <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"> -->
-<!--         <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
-<!--       </div> -->
-<!--       <div class="mb-3"> -->
-<!--         <label for="exampleInputPassword1" class="form-label">Password</label> -->
-<!--         <input type="password" class="form-control" id="exampleInputPassword1"> -->
-<!--       </div> -->
-<!--       <button type="submit" class="btn btn-primary">Submit</button> -->
-<!--     </form> -->
-<!-- </div> -->
-
-
-<div class="container", style="max-width: 500px; margin-top: 50px;">
-<form action="{{ url_for('login') }}" method="post">
-    {{form.hidden_tag()}}
-    <div class="d-flex justify-content-center">
-        <div class="col-md-8">
-            <center><h1 class="mt-5">Вхід</h1></center>
-            {% for field in form if field.type != 'CSRFTokenField' %}
-              <div class="mb-3">
-                {{ field.label() }}
-                {{ field(class = 'form-control') }}
-              </div>
-              {% endfor %}
-            <button type="submit" class="btn btn-success btn-lg">
-                Submit
-            </button>
+            </form>
         </div>
     </div>
-</form>
 </div>
 {% endblock main %}

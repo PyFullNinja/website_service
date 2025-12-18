@@ -1,25 +1,48 @@
 {% extends 'base.html' %}
+
 {% block title %}
 {% endblock title %}
 
 {% block main %}
-<form action="{{ url_for('register') }}" method="post">
-    {{form.hidden_tag()}}
-    <div class="d-flex justify-content-center">
-        <div class="col-md-5">
-          <center><h2 style="margin-top:20px;">Регістрація</h2></center> 
-            {% for field in form if field.type != 'CSRFTokenField' %}
-                <div class="card-body", style="margin-top:10px;">
-                    {{ field.label() }}
-                    {{ field(class = 'form-control') }}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+    
+    <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+        <div class="card-body p-5">
+            
+            <h2 class="text-center mb-4 fw-bold text-secondary">Реєстрація</h2>
+            
+            <form action="{{ url_for('register') }}" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                
+                {% for field in form if field.type != 'CSRFTokenField' %}
+                    <div class="mb-3">
+                        {{ field.label(class="form-label fw-semibold text-muted small") }}
+                        
+                        {% if field.errors %}
+                            {{ field(class="form-control form-control-lg is-invalid bg-light") }}
+                            <div class="invalid-feedback">
+                                {% for error in field.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ field(class="form-control form-control-lg bg-light border-0") }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-success btn-lg rounded-pill shadow-sm fw-bold">
+                        Зареєструватися
+                    </button>
                 </div>
-            {% endfor %}
-            
-            <button type="submit" class="btn btn-success btn-lg", style="margin-top:20px;">
-                Submit
-            </button>
-            
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Вже є акаунт? <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold">Увійти</a></small>
+                </div>
+
+            </form>
         </div>
     </div>
-</form>
+</div>
 {% endblock main %}

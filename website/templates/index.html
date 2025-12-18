@@ -5,18 +5,20 @@
 
 
 {% block main %}
-<div style="display: flex; flex-wrap: wrap; gap: 20px; max-width: 800px; margin-top: 50px;">
+<div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
 {% for service in services %}
-    <div class="card" style="width: 20rem;">
-    <img src="{{ service.photos[0].photo_url }}" class="card-img-top" alt="...">
-    <div class="card-body">
-        <h5 class="card-title">{{ service.service_name }}</h5>
-        <p class="card-text">{{ service.price }} грн</p>
-        <a href="{{url_for('service', service_id=service.id)}}" class="btn btn-primary">Деталі</a>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div style="height: 200px; overflow: hidden;">
+                <img src="{{ service.photos[0].photo_url }}" class="card-img-top w-100 h-100" style="object-fit: cover;" alt="...">
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title fw-bold">{{ service.service_name }}</h5>
+                <p class="card-text text-muted">Ціна: <span class="text-primary fw-bold">{{ service.price }} грн</span></p>
+                <a href="{{url_for('service', service_id=service.id)}}" class="btn btn-outline-primary mt-auto w-100">Деталі</a>
+            </div>
+        </div>
     </div>
-    </div>
-
-
 {% endfor %}
 </div>
 {% endblock main %}

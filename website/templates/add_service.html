@@ -1,31 +1,94 @@
 {% extends 'base.html' %}
-{% block title %}
-{{ title }}
-{% endblock title %}
-
+{% block title %}{{ title }}{% endblock title %}
 
 {% block main %}
-<div class="container", style="max-width: 800px; margin-top: 50px;">
-<form action="{{ url_for('add_service') }}" method="post" enctype="multipart/form-data">
-    {{form.hidden_tag()}}
-    <div class="d-flex justify-content-center">
-        <div class="col-md-8">
-            <center><h1 class="mt-5">Додати свою послугу</h1></center>
-            {% for field in form if field.type != 'CSRFTokenField' %}
-              <div class="mb-3">
-                {{ field.label() }}
-                {{ field(class = 'form-control') }}
-              </div>
-              {% endfor %}
-            <div class="mb-3">
-                <label for="photo" class="form-label">Фото послуги</label>
-                <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h1 class="fw-bold text-uppercase" style="letter-spacing: 1px;">Додати нову послугу</h1>
             </div>
-            <button type="Sumbit" class="btn btn-success btn-lg">
-                Виставити
-            </button>
+
+            <div class="card border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="card-body p-4 p-md-5">
+                    <form action="{{ url_for('add_service') }}" method="post" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+
+                        <div class="row g-4">
+                            {% for field in form if field.type != 'CSRFTokenField' %}
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold mb-2" style="font-size: 0.9rem;">
+                                        {{ field.label.text }}
+                                    </label>
+                                    
+                                    {# Проверка для поля описания: делаем его крупным #}
+                                    {% if field.type == 'TextAreaField' or field.id == 'description' %}
+                                        {{ field(class = 'form-control bg-light border-0', 
+                                                 style='border-radius: 12px; font-size: 1rem; min-height: 180px;', 
+                                                 rows="6", 
+                                                 placeholder="Детально опишіть, що саме ви пропонуєте...") }}
+                                    {% else %}
+                                        {{ field(class = 'form-control form-control-lg bg-light border-0', 
+                                                 style='border-radius: 10px; font-size: 1rem;')}}
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="text-danger small mt-1">{{ error }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            <div class="col-12">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <label for="photo" class="form-label fw-semibold">Фотографія послуги</label>
+                                    <input class="form-control" type="file" id="photo" name="photo" accept="image/*" required>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4 d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold rounded-pill shadow-sm">
+                                    Опублікувати послугу
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('index') }}" class="text-decoration-none text-muted small">
+                    <i class="bi bi-arrow-left"></i> Повернутися на головну
+                </a>
+            </div>
         </div>
     </div>
-</form>
 </div>
+
+<style>
+    /* Плавные переходы и стили фокуса */
+    .form-control:focus {
+        background-color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        border: 1px solid #0d6efd !important;
+    }
+    
+    .btn-primary {
+        transition: all 0.3s ease;
+        background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4) !important;
+    }
+
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 576px) {
+        .card-body { padding: 1.5rem !important; }
+        h1 { font-size: 1.5rem; }
+    }
+</style>
 {% endblock main %}

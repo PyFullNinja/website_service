@@ -71,11 +71,16 @@
 </div>
 
 <style>
+    .form-control {
+        color: #212529 !important; /* Темно-серый, почти черный */
+    }
+
     /* Эффект фокуса для полей ввода */
     .form-control:focus {
         background-color: #fff !important;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         border: 1px solid #0d6efd !important;
+        color: #212529 !important;
     }
     
     /* Анимация кнопки */
@@ -85,6 +90,10 @@
     .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3) !important;
+    }
+
+    .form-control::placeholder {
+        color: #6c757d !important;
     }
 </style>
 {% endblock main %}

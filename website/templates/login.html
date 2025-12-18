@@ -42,4 +42,24 @@
         </div>
     </div>
 </div>
+
+
+<style>
+    /* Явно задаем цвет текста для всех полей */
+    .form-control {
+        color: #212529 !important; /* Темно-серый, почти черный */
+    }
+
+    /* Цвет текста при печати (в фокусе) */
+    .form-control:focus {
+        color: #212529 !important;
+        background-color: #fff !important; /* Белый фон при фокусе для контраста */
+    }
+
+    /* Цвет плейсхолдера (подсказки) */
+    .form-control::placeholder {
+        color: #6c757d !important;
+    }
+</style>
+
 {% endblock main %}

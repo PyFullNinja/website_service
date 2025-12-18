@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 from website import db
-
+from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 
@@ -30,6 +30,7 @@ class Services(db.Model, UserMixin):
     user_id = db.Column(db.Integer, ForeignKey("users.id", name="fk_services_user_id"), nullable=False)
     contact = db.Column(db.String(150), nullable=False)
     photos = db.relationship("Photos", backref="service", lazy=True)
+    viewers = db.relationship("Views", backref="service", cascade="all, delete-orphan")
     views = db.Column(db.Integer, default=0)
 
     def __repr__(self):
@@ -45,3 +46,10 @@ class Photos(db.Model, UserMixin):
 
     def __repr__(self):
         return f"<Photo {self.photo_url}>"
+
+
+class Views(db.Model, UserMixin):
+    __tablename__ = "service_views"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    service_id = db.Column(db.Integer, db.ForeignKey("services.id"), nullable=False)

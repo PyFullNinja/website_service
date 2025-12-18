@@ -5,11 +5,28 @@
 
 {% block main %}
 <div class="container mt-5">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="row justify-content-center mb-3">
+                <div class="col-lg-10">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="bi {{ 'bi-exclamation-triangle-fill' if category == 'error' else 'bi-check-circle-fill' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 24px;">
-                    {{ current_user.first_name[0] }}
+                    {{ current_user.first_name[0] | upper }}
                 </div>
                 <div class="ms-3">
                     <h2 class="mb-0 fw-bold">Особистий кабінет</h2>
@@ -56,37 +73,39 @@
                 </div>
 
                 <div class="tab-pane fade" id="pills-services" role="tabpanel">
-                    {% for service in services %}
-                    <div class="card border-0 shadow-sm mb-3 overflow-hidden" style="border-radius: 12px;">
-                        <div class="row g-0">
-                            <div class="col-md-2 bg-light d-flex align-items-center justify-content-center" style="min-height: 120px;">
-                                {% if service.photos %}
-                                <img src="{{ service.photos[0].photo_url }}" class="img-fluid object-fit-cover h-100" alt="...">
-                                {% else %}
-                                <i class="bi bi-image text-secondary fs-1"></i>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-10">
-                                <div class="card-body d-flex flex-column h-100">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <h5 class="card-title fw-bold">{{ service.service_name }}</h5>
-                                        <span class="badge bg-soft-primary text-primary border border-primary px-3">{{ service.price }} грн</span>
-                                    </div>
-                                    <p class="card-text text-muted small flex-grow-1 mt-2 text-truncate" style="max-width: 500px;">{{ service.description }}</p>
-                                    <div class="mt-3 d-flex gap-2">
-                                        <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-primary btn-sm px-3">Редагувати</a>
-                                        <a href="{{ url_for('delete_service', service_id=service.id)}}" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Ви впевнені?')">Видалити</a>
+                    {% if services %}
+                        {% for service in services %}
+                        <div class="card border-0 shadow-sm mb-3 overflow-hidden" style="border-radius: 12px;">
+                            <div class="row g-0">
+                                <div class="col-md-2 bg-light d-flex align-items-center justify-content-center" style="min-height: 120px;">
+                                    {% if service.photos %}
+                                    <img src="{{ service.photos[0].photo_url }}" class="img-fluid object-fit-cover h-100 w-100" alt="...">
+                                    {% else %}
+                                    <i class="bi bi-image text-secondary fs-1"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="card-body d-flex flex-column h-100">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h5 class="card-title fw-bold">{{ service.service_name }}</h5>
+                                            <span class="badge bg-soft-primary text-primary border border-primary px-3">{{ service.price }} грн</span>
+                                        </div>
+                                        <p class="card-text text-muted small flex-grow-1 mt-2 text-truncate" style="max-width: 500px;">{{ service.description }}</p>
+                                        <div class="mt-3 d-flex gap-2">
+                                            <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-primary btn-sm px-3">Редагувати</a>
+                                            <a href="{{ url_for('delete_service', service_id=service.id)}}" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Ви впевнені?')">Видалити</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        {% endfor %}
                     {% else %}
-                    <div class="text-center py-5">
-                        <p class="text-muted">У вас ще немає доданих послуг.</p>
-                        <a href="{{ url_for('add_service') }}" class="btn btn-primary mt-2">Додати першу послугу</a>
-                    </div>
-                    {% endfor %}
+                        <div class="text-center py-5">
+                            <p class="text-muted">У вас ще немає доданих послуг.</p>
+                            <a href="{{ url_for('add_service') }}" class="btn btn-primary mt-2">Додати першу послугу</a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

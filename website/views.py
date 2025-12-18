@@ -1,7 +1,7 @@
 import os
 import uuid as uuid
 
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for, flash
 from flask_login import current_user, login_required, login_user, logout_user
 from website import app, cache, db, login_manager
 from website.forms import *
@@ -215,7 +215,7 @@ def admin_delete_service(service_id):
     
     service_delete = Services.query.get_or_404(service_id)
     
-    Photos.query.filter_by(service_id=service.id).delete()
+    Photos.query.filter_by(service_id=service_delete.id).delete()
     
     db.session.delete(service_delete)
     db.session.commit()
@@ -254,13 +254,16 @@ def users():
 @app.route('/change_password/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def change_password(user_id):
+    if current_user.id != user_id:
+        return redirect(url_for("index"))
     form = ChangePassword()
     if form.validate_on_submit():
         user = Users.query.get_or_404(user_id)
-        if user.password != generate_password_hash(request.form['password_old']):
-            return redirect(url_for('users'))
-        else:
-            user.password = generate_password_hash(request.form['password_new'])
+        if not check_password_hash(user.password, request.form['old_password']):
+            flash('Невірний поточний пароль', 'error')
+            return redirect(url_for('change_password', user_id=user_id))
+        user.password = generate_password_hash(request.form['new_password'])
+        flash('Пароль успішно змінено', 'success')
         db.session.commit()
         return redirect(url_for('profile'))
     

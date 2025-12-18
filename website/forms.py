@@ -36,5 +36,5 @@ class AdminForm(FlaskForm):
 
 class ChangePassword(FlaskForm):
     old_password = PasswordField("Старий пароль", [validators.DataRequired()])
-    password = PasswordField("Новий пароль", [validators.DataRequired()])
+    new_password = PasswordField("Новий пароль", [validators.DataRequired()])
     confirm = PasswordField("Підтвердження паролю", [validators.DataRequired()])

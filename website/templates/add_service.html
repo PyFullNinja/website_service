@@ -72,12 +72,22 @@
         background-color: #fff !important;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         border: 1px solid #0d6efd !important;
+        color: #212529 !important;
+    }
+
+    .form-control::placeholder {
+        color: #6c757d !important;
     }
     
     .btn-primary {
         transition: all 0.3s ease;
         background: linear-gradient(45deg, #0d6efd, #0b5ed7);
         border: none;
+    }
+
+    .form-control:focus {
+        color: #212529 !important;
+        background-color: #fff !important; /* Белый фон при фокусе для контраста */
     }
     
     .btn-primary:hover {

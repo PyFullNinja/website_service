@@ -113,10 +113,16 @@ def add_service():
 
 @app.route("/service/<int:service_id>")
 @cache.cached(timeout=60)
+@login_required
 def service(service_id):
     service = Services.query.get_or_404(service_id)
-    service.views += 1
-    db.session.commit()
+    if current_user.is_authenticated:
+        view_user = Views.query.filter_by(user_id = current_user.id, service_id = service_id).first()
+        if not view_user:
+            new_view = Views(user_id = current_user.id , service_id=service_id)
+            db.session.add(new_view)
+            service.views += 1
+            db.session.commit()
     return render_template("service.html", title="Послуга", service=service)
 
 
@@ -229,19 +235,16 @@ def admin_delete_service(service_id):
 def delete_user(user_id):
     if not current_user.is_admin:
         return redirect(url_for("index"))
-    
     user_to_delete = Users.query.get_or_404(user_id)
-    
+    Views.query.filter_by(user_id=user_id).delete()
     services = Services.query.filter_by(user_id=user_id).all()
     for service in services:
+        Views.query.filter_by(service_id=service.id).delete()
         Photos.query.filter_by(service_id=service.id).delete()
         db.session.delete(service)
-    
     db.session.delete(user_to_delete)
     db.session.commit()
-    
     return redirect(url_for('users'))
-
 
 @app.route('/users')
 @login_required

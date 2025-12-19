@@ -16,6 +16,19 @@ from sqlalchemy.exc import IntegrityError
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
+#функция логирования действий, берет категорию и действие
+@login_required
+def add_log(category, action):
+    new_log = Logs(
+        user_id=current_user.id,
+        category=category,
+        action=action,
+        ip_address=request.remote_addr
+    )
+    db.session.add(new_log)
+    db.session.commit()
+
+
 
 @app.route("/")
 def index():
@@ -38,7 +51,10 @@ def login():
 
         if user and check_password_hash(user.password, password):
             login_user(user)
+            add_log("user", f"Користувач {username} авторизувався")
             return redirect(url_for("index"))
+        else:
+            flash("Невірний логін або пароль")
     return render_template("login.html", title="Авторизація", form=form)
 
 
@@ -57,9 +73,11 @@ def register():
         try:
             db.session.add(user)
             db.session.commit()
+            add_log("user", f"Користувач {username} зареєструвався")
             return redirect(url_for("login"))
         except IntegrityError:
             db.session.rollback()
+            flash("Користувач з таким логіном вже існує")
 
     return render_template("register.html", title="Реєстрація", form=form)
 
@@ -91,6 +109,8 @@ def add_service():
         )
         db.session.add(service)
         db.session.commit()
+
+        add_log("user", f"Користувач {current_user.username} додав послугу {service.service_name}")
 
         if "photo" in request.files:
             photo = request.files["photo"]
@@ -144,6 +164,8 @@ def edit_service(service_id):
 
         db.session.commit()
 
+        add_log("user", f"Користувач {current_user.username} редагував послугу {service.service_name}")
+
         if "photo" in request.files:
             photo = request.files["photo"]
             filename = secure_filename(photo.filename)
@@ -178,6 +200,7 @@ def delete_service(service_id):
     Photos.query.filter_by(service_id=service.id).delete()
     db.session.delete(service)
     db.session.commit()
+    add_log("user", f"Користувач {current_user.username} видалив послугу {service.service_name}")
     return redirect(url_for("profile"))
 
 @app.route('/admin_panel')
@@ -194,6 +217,8 @@ def add_admin():
     if not current_user.is_admin:
         return redirect(url_for("index"))
     
+    all_admin = Users.query.filter_by(is_admin=True).all()
+    
     form = AdminForm()
     if form.validate_on_submit():
         username = form.username.data
@@ -201,8 +226,31 @@ def add_admin():
         if user:
             user.is_admin = True
             db.session.commit()
+            all_admin = Users.query.filter_by(is_admin=True).all()
+        add_log("admin", f"Адмін {current_user.username} додав адміна {username}")
     
-    return render_template('admin_panel.html', title='Додати адміна', show="додати адміна", form=form)
+    return render_template('admin_panel.html', title='Додати адміна', show="додати адміна", form=form, all_admin=all_admin)
+
+
+@app.route('/delete_admin/<int:user_id>')
+@login_required
+def delete_admin(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for("index"))
+    user_to_delete = Users.query.get_or_404(user_id)
+    if user_to_delete.is_admin:
+        if user_to_delete.id == current_user.id:
+            flash("Ви не можете видалити себе!", "danger")
+            return redirect(url_for("admin_panel"))
+        elif user_to_delete.username == "admin":
+            flash("Ви не можете видалити адміна!", "danger")
+            return redirect(url_for("admin_panel"))
+        else:
+            user_to_delete.is_admin = False
+            db.session.commit()
+            add_log("admin", f"Адмін {current_user.username} видалив адміна {user_to_delete.username}")
+            flash("Адмін успішно видалений!", "success")
+    return redirect(url_for("add_admin"))
 
 
 @app.route('/manage_services')
@@ -225,7 +273,7 @@ def admin_delete_service(service_id):
     
     db.session.delete(service_delete)
     db.session.commit()
-    
+    add_log("admin", f"Адмін {current_user.username} видалив послугу {service_delete.service_name}")
     return redirect(url_for('manage_services'))
 
 
@@ -242,8 +290,10 @@ def delete_user(user_id):
         Views.query.filter_by(service_id=service.id).delete()
         Photos.query.filter_by(service_id=service.id).delete()
         db.session.delete(service)
+        add_log("admin", f"Адмін {current_user.username} видалив послугу {service.service_name} у результаті видалення користувача {user_to_delete.username}")
     db.session.delete(user_to_delete)
     db.session.commit()
+    add_log("admin", f"Адмін {current_user.username} видалив користувача {user_to_delete.username}")
     return redirect(url_for('users'))
 
 @app.route('/users')
@@ -271,3 +321,12 @@ def change_password(user_id):
         return redirect(url_for('profile'))
     
     return render_template('change_password.html', title='Зміна паролю', user_id=user_id, form=form)
+
+
+@app.route('/admin_logs')
+@login_required
+def admin_logs():
+    if not current_user.is_admin:
+        return redirect(url_for("index"))
+    logs = Logs.query.order_by(Logs.time.desc()).all()
+    return render_template('admin_panel.html', title='Логи дій', show='logs', logs=logs)

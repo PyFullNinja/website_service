@@ -53,3 +53,17 @@ class Views(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey("services.id"), nullable=False)
+
+
+class Logs(db.Model, UserMixin):
+    __tablename__ = "logs"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False) #пользователь
+    time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) #время
+    category = db.Column(db.String(20), nullable=False) #категория
+    action = db.Column(db.String(255), nullable=False) #действие 
+    ip_address = db.Column(db.String(45), nullable=True) #ip
+    user = db.relationship('Users', backref=db.backref('logs', lazy=True)) #пользователь
+
+    def __repr__(self):
+        return f"<Log {self.id}>"
